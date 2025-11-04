@@ -1,0 +1,168 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Plus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+
+interface Listing {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  location: string;
+  category: string;
+  image_urls: string[];
+  created_at: string;
+  profiles?: {
+    full_name: string;
+  } | null;
+}
+
+const Marketplace = () => {
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    fetchListings();
+
+    const channel = supabase
+      .channel("livestock_listings_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "livestock_listings",
+        },
+        () => {
+          fetchListings();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const fetchListings = async () => {
+    const { data, error } = await supabase
+      .from("livestock_listings")
+      .select("*")
+      .eq("status", "active")
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setListings(data as any);
+    }
+    setLoading(false);
+  };
+
+  const getCategoryColor = (category: string) => {
+    const colors: Record<string, string> = {
+      cattle: "bg-primary/10 text-primary",
+      goat: "bg-secondary/10 text-secondary",
+      sheep: "bg-accent/10 text-accent",
+      poultry: "bg-success/10 text-success",
+      other: "bg-muted text-muted-foreground",
+    };
+    return colors[category] || colors.other;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading listings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Marketplace</h1>
+          <p className="text-muted-foreground">Browse livestock listings from farmers</p>
+        </div>
+        {user && (
+          <Link to="/create-listing">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Listing
+            </Button>
+          </Link>
+        )}
+      </div>
+
+      {listings.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <p className="text-muted-foreground mb-4">No listings available yet</p>
+            {user && (
+              <Link to="/create-listing">
+                <Button>Create First Listing</Button>
+              </Link>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {listings.map((listing) => (
+            <Card key={listing.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="aspect-video bg-muted relative">
+                {listing.image_urls && listing.image_urls.length > 0 ? (
+                  <img
+                    src={listing.image_urls[0]}
+                    alt={listing.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                    No image
+                  </div>
+                )}
+                <Badge className={`absolute top-2 right-2 ${getCategoryColor(listing.category)}`}>
+                  {listing.category}
+                </Badge>
+              </div>
+              <CardHeader>
+                <CardTitle className="line-clamp-1">{listing.title}</CardTitle>
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {listing.description}
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-primary">
+                      KES {listing.price.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <MapPin className="mr-1 h-4 w-4" />
+                    {listing.location}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Seller: Verified Farmer
+                  </p>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button className="w-full">Contact Seller</Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Marketplace;
