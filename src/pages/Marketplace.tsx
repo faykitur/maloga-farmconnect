@@ -3,9 +3,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Plus } from "lucide-react";
+import { MapPin, Plus, Phone, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface Listing {
   id: string;
@@ -16,15 +24,21 @@ interface Listing {
   category: string;
   image_urls: string[];
   created_at: string;
-  profiles?: {
-    full_name: string;
-  } | null;
+  seller_id: string;
+}
+
+interface SellerProfile {
+  full_name: string | null;
+  phone: string | null;
 }
 
 const Marketplace = () => {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedSeller, setSelectedSeller] = useState<SellerProfile | null>(null);
+  const [contactDialogOpen, setContactDialogOpen] = useState(false);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchListings();
@@ -60,6 +74,26 @@ const Marketplace = () => {
       setListings(data as any);
     }
     setLoading(false);
+  };
+
+  const handleContactSeller = async (sellerId: string) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("full_name, phone")
+      .eq("id", sellerId)
+      .maybeSingle();
+
+    if (error || !data) {
+      toast({
+        title: "Error",
+        description: "Could not fetch seller information",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSelectedSeller(data);
+    setContactDialogOpen(true);
   };
 
   const getCategoryColor = (category: string) => {
@@ -155,12 +189,48 @@ const Marketplace = () => {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button className="w-full">Contact Seller</Button>
+                <Button 
+                  className="w-full"
+                  onClick={() => handleContactSeller(listing.seller_id)}
+                >
+                  Contact Seller
+                </Button>
               </CardFooter>
             </Card>
           ))}
         </div>
       )}
+
+      <Dialog open={contactDialogOpen} onOpenChange={setContactDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Contact Seller</DialogTitle>
+            <DialogDescription>
+              Reach out to the seller using the information below
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedSeller?.full_name && (
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">Name:</span>
+                <span>{selectedSeller.full_name}</span>
+              </div>
+            )}
+            {selectedSeller?.phone && (
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                <span className="font-semibold">Phone:</span>
+                <a href={`tel:${selectedSeller.phone}`} className="text-primary hover:underline">
+                  {selectedSeller.phone}
+                </a>
+              </div>
+            )}
+            {!selectedSeller?.phone && !selectedSeller?.full_name && (
+              <p className="text-muted-foreground">No contact information available</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
