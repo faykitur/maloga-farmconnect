@@ -13,6 +13,7 @@ import Slaughterhouses from "./pages/Slaughterhouses";
 import Forum from "./pages/Forum";
 import Videos from "./pages/Videos";
 import Education from "./pages/Education";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/forum" element={<Layout><Forum /></Layout>} />
             <Route path="/videos" element={<Layout><Videos /></Layout>} />
             <Route path="/education" element={<Layout><Education /></Layout>} />
+            <Route path="/admin" element={<Layout><ProtectedRoute><AdminDashboard /></ProtectedRoute></Layout>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

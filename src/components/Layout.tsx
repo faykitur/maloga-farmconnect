@@ -1,8 +1,9 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Store, MapPin, MessageSquare, Video, BookOpen, Bell, User, LogOut } from "lucide-react";
+import { Home, Store, MapPin, MessageSquare, Video, BookOpen, Bell, User, LogOut, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,24 @@ interface LayoutProps {
 export const Layout = ({ children }: LayoutProps) => {
   const { user, signOut } = useAuth();
   const location = useLocation();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      checkAdminStatus();
+    }
+  }, [user]);
+
+  const checkAdminStatus = async () => {
+    if (!user) return;
+    
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id);
+
+    setIsAdmin(roles?.some((r) => r.role === "superadmin") || false);
+  };
 
   const navItems = [
     { path: "/", icon: Home, label: "Home" },
@@ -67,6 +86,19 @@ export const Layout = ({ children }: LayoutProps) => {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Admin Dashboard */}
+            {isAdmin && (
+              <Link to="/admin">
+                <Button 
+                  variant={location.pathname === "/admin" ? "default" : "ghost"} 
+                  size="icon" 
+                  title="Admin Dashboard"
+                >
+                  <Shield className="h-5 w-5" />
+                </Button>
+              </Link>
+            )}
+
             {/* Notifications */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

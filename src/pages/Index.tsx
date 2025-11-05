@@ -2,10 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Store, MapPin, MessageSquare, Video, BookOpen, TrendingUp } from "lucide-react";
-import cowImage from "@/assets/livestock-cow.jpg";
-import goatsImage from "@/assets/livestock-goats.jpg";
-import sheepImage from "@/assets/livestock-sheep.jpg";
-import chickensImage from "@/assets/livestock-chickens.jpg";
+import heroImage from "@/assets/livestock-hero.jpg";
 
 const Index = () => {
   const features = [
@@ -16,27 +13,24 @@ const Index = () => {
     { icon: BookOpen, title: "Education", desc: "Training resources", path: "/education" },
   ];
 
-  const livestockImages = [
-    { src: cowImage, alt: "Healthy cattle in pasture" },
-    { src: goatsImage, alt: "Farm goats" },
-    { src: sheepImage, alt: "Grazing sheep" },
-    { src: chickensImage, alt: "Free-range chickens" }
-  ];
-
   return (
     <div className="space-y-12">
-      {/* Livestock Showcase */}
-      <section className="relative overflow-hidden rounded-xl">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          {livestockImages.map((image, index) => (
-            <div key={index} className="aspect-[4/3] overflow-hidden rounded-lg">
-              <img 
-                src={image.src} 
-                alt={image.alt}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-          ))}
+      {/* Hero Section with Livestock */}
+      <section className="relative overflow-hidden rounded-xl h-[400px] md:h-[500px]">
+        <img 
+          src={heroImage} 
+          alt="Diverse livestock grazing together in harmony"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/40 to-transparent flex items-end">
+          <div className="p-8 md:p-12">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-2 drop-shadow-lg">
+              Connect with Quality Livestock
+            </h2>
+            <p className="text-lg md:text-xl text-white/90 drop-shadow-md">
+              Your trusted marketplace for buying and selling farm animals
+            </p>
+          </div>
         </div>
       </section>
 
