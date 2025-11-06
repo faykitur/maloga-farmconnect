@@ -7,6 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { DollarSign, Users, ShoppingBag, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UserManagement } from "@/components/admin/UserManagement";
+import { ListingManagement } from "@/components/admin/ListingManagement";
+import { EducationManagement } from "@/components/admin/EducationManagement";
 
 interface Commission {
   id: string;
@@ -129,112 +133,135 @@ const AdminDashboard = () => {
       <div>
         <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
         <p className="text-muted-foreground">
-          Monitor platform performance and manage commissions
+          Manage users, listings, and platform content
         </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${stats.totalCommissions.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">From all commissions</p>
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="listings">Listings</TabsTrigger>
+          <TabsTrigger value="education">Education</TabsTrigger>
+        </TabsList>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Revenue</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${stats.pendingCommissions.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Awaiting completion</p>
-          </CardContent>
-        </Card>
+        <TabsContent value="overview" className="space-y-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">${stats.totalCommissions.toFixed(2)}</div>
+                <p className="text-xs text-muted-foreground">From all commissions</p>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Listings</CardTitle>
-            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalListings}</div>
-            <p className="text-xs text-muted-foreground">Live on marketplace</p>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pending Revenue</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">${stats.pendingCommissions.toFixed(2)}</div>
+                <p className="text-xs text-muted-foreground">Awaiting completion</p>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalUsers}</div>
-            <p className="text-xs text-muted-foreground">Registered accounts</p>
-          </CardContent>
-        </Card>
-      </div>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Active Listings</CardTitle>
+                <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalListings}</div>
+                <p className="text-xs text-muted-foreground">Live on marketplace</p>
+              </CardContent>
+            </Card>
 
-      {/* Commissions Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Commissions</CardTitle>
-          <CardDescription>Track your earnings from platform transactions</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Sale Amount</TableHead>
-                <TableHead>Commission Rate</TableHead>
-                <TableHead>Your Earnings</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {commissions.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
-                    No commissions yet
-                  </TableCell>
-                </TableRow>
-              ) : (
-                commissions.map((commission) => (
-                  <TableRow key={commission.id}>
-                    <TableCell>
-                      {new Date(commission.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>${Number(commission.amount).toFixed(2)}</TableCell>
-                    <TableCell>{commission.commission_rate}%</TableCell>
-                    <TableCell className="font-semibold">
-                      ${Number(commission.commission_amount).toFixed(2)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          commission.status === "completed"
-                            ? "default"
-                            : commission.status === "pending"
-                            ? "secondary"
-                            : "destructive"
-                        }
-                      >
-                        {commission.status}
-                      </Badge>
-                    </TableCell>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalUsers}</div>
+                <p className="text-xs text-muted-foreground">Registered accounts</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Commissions Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Commissions</CardTitle>
+              <CardDescription>Track your earnings from platform transactions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Sale Amount</TableHead>
+                    <TableHead>Commission Rate</TableHead>
+                    <TableHead>Your Earnings</TableHead>
+                    <TableHead>Status</TableHead>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                  {commissions.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center text-muted-foreground">
+                        No commissions yet
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    commissions.map((commission) => (
+                      <TableRow key={commission.id}>
+                        <TableCell>
+                          {new Date(commission.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>${Number(commission.amount).toFixed(2)}</TableCell>
+                        <TableCell>{commission.commission_rate}%</TableCell>
+                        <TableCell className="font-semibold">
+                          ${Number(commission.commission_amount).toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              commission.status === "completed"
+                                ? "default"
+                                : commission.status === "pending"
+                                ? "secondary"
+                                : "destructive"
+                            }
+                          >
+                            {commission.status}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-6">
+          <UserManagement />
+        </TabsContent>
+
+        <TabsContent value="listings" className="space-y-6">
+          <ListingManagement />
+        </TabsContent>
+
+        <TabsContent value="education" className="space-y-6">
+          <EducationManagement />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

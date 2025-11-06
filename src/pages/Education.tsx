@@ -1,84 +1,50 @@
+import { useEffect, useState } from "react";
 import { BookOpen, Video, FileText, Award } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-const educationalResources = [
-  {
-    id: 1,
-    title: "Cattle Nutrition and Feeding",
-    description: "Learn optimal feeding practices for healthy cattle growth",
-    category: "cattle",
-    type: "video",
-    duration: "45 min",
-    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  },
-  {
-    id: 2,
-    title: "Disease Prevention in Livestock",
-    description: "Essential vaccination schedules and disease management",
-    category: "health",
-    type: "article",
-    duration: "15 min read",
-    url: "https://example.com/disease-prevention",
-  },
-  {
-    id: 3,
-    title: "Goat Breeding Best Practices",
-    description: "Comprehensive guide to successful goat breeding programs",
-    category: "goat",
-    type: "video",
-    duration: "30 min",
-    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  },
-  {
-    id: 4,
-    title: "Poultry Farm Management",
-    description: "From chicks to layers - complete poultry farming guide",
-    category: "poultry",
-    type: "course",
-    duration: "2 hours",
-    url: "https://example.com/poultry-course",
-  },
-  {
-    id: 5,
-    title: "Sheep Wool Quality Management",
-    description: "Techniques for producing high-quality wool",
-    category: "sheep",
-    type: "article",
-    duration: "20 min read",
-    url: "https://example.com/sheep-wool",
-  },
-  {
-    id: 6,
-    title: "Organic Livestock Farming",
-    description: "Transitioning to organic livestock production methods",
-    category: "general",
-    type: "course",
-    duration: "3 hours",
-    url: "https://example.com/organic-farming",
-  },
-  {
-    id: 7,
-    title: "Pasture Management",
-    description: "Rotational grazing and sustainable pasture practices",
-    category: "general",
-    type: "video",
-    duration: "40 min",
-    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  },
-  {
-    id: 8,
-    title: "Record Keeping for Farmers",
-    description: "Essential records and data management for livestock farms",
-    category: "management",
-    type: "article",
-    duration: "10 min read",
-    url: "https://example.com/record-keeping",
-  },
-];
+interface EducationalResource {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  type: string;
+  duration: string;
+  url: string;
+}
 
 const Education = () => {
+  const [educationalResources, setEducationalResources] = useState<EducationalResource[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchResources();
+  }, []);
+
+  const fetchResources = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("educational_resources")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setEducationalResources(data || []);
+    } catch (error) {
+      console.error("Error fetching resources:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load educational resources",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   const getIcon = (type: string) => {
     switch (type) {
       case "video":
@@ -104,6 +70,17 @@ const Education = () => {
         return "bg-muted text-muted-foreground";
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading educational resources...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

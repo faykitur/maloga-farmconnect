@@ -96,6 +96,45 @@ export type Database = {
           },
         ]
       }
+      educational_resources: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string
+          description: string
+          duration: string
+          id: string
+          title: string
+          type: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          created_by: string
+          description: string
+          duration: string
+          id?: string
+          title: string
+          type: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string
+          description?: string
+          duration?: string
+          id?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       livestock_listings: {
         Row: {
           category: string
