@@ -298,7 +298,7 @@ export type Database = {
           title: string
           updated_at: string
           user_id: string
-          video_url: string
+          video_url: string | null
         }
         Insert: {
           category: string
@@ -310,7 +310,7 @@ export type Database = {
           title: string
           updated_at?: string
           user_id: string
-          video_url: string
+          video_url?: string | null
         }
         Update: {
           category?: string
@@ -322,7 +322,7 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string
-          video_url?: string
+          video_url?: string | null
         }
         Relationships: []
       }

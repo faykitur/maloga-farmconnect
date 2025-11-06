@@ -11,6 +11,7 @@ const educationalResources = [
     category: "cattle",
     type: "video",
     duration: "45 min",
+    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   },
   {
     id: 2,
@@ -19,6 +20,7 @@ const educationalResources = [
     category: "health",
     type: "article",
     duration: "15 min read",
+    url: "https://example.com/disease-prevention",
   },
   {
     id: 3,
@@ -27,6 +29,7 @@ const educationalResources = [
     category: "goat",
     type: "video",
     duration: "30 min",
+    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   },
   {
     id: 4,
@@ -35,6 +38,7 @@ const educationalResources = [
     category: "poultry",
     type: "course",
     duration: "2 hours",
+    url: "https://example.com/poultry-course",
   },
   {
     id: 5,
@@ -43,6 +47,7 @@ const educationalResources = [
     category: "sheep",
     type: "article",
     duration: "20 min read",
+    url: "https://example.com/sheep-wool",
   },
   {
     id: 6,
@@ -51,6 +56,7 @@ const educationalResources = [
     category: "general",
     type: "course",
     duration: "3 hours",
+    url: "https://example.com/organic-farming",
   },
   {
     id: 7,
@@ -59,6 +65,7 @@ const educationalResources = [
     category: "general",
     type: "video",
     duration: "40 min",
+    url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   },
   {
     id: 8,
@@ -67,6 +74,7 @@ const educationalResources = [
     category: "management",
     type: "article",
     duration: "10 min read",
+    url: "https://example.com/record-keeping",
   },
 ];
 
@@ -131,7 +139,9 @@ const Education = () => {
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">{resource.duration}</span>
-                    <Button size="sm">View</Button>
+                    <Button size="sm" onClick={() => window.open(resource.url, "_blank")}>
+                      View
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -160,7 +170,9 @@ const Education = () => {
                   <CardContent>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">{resource.duration}</span>
-                      <Button size="sm">Watch</Button>
+                      <Button size="sm" onClick={() => window.open(resource.url, "_blank")}>
+                        Watch
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -189,7 +201,9 @@ const Education = () => {
                   <CardContent>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">{resource.duration}</span>
-                      <Button size="sm">Read</Button>
+                      <Button size="sm" onClick={() => window.open(resource.url, "_blank")}>
+                        Read
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -218,7 +232,9 @@ const Education = () => {
                   <CardContent>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">{resource.duration}</span>
-                      <Button size="sm">Enroll</Button>
+                      <Button size="sm" onClick={() => window.open(resource.url, "_blank")}>
+                        Enroll
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

@@ -228,19 +228,6 @@ const Videos = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="video_url">Video URL</Label>
-                  <Input
-                    id="video_url"
-                    type="url"
-                    placeholder="https://youtube.com/watch?v=..."
-                    value={formData.video_url}
-                    onChange={(e) =>
-                      setFormData({ ...formData, video_url: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div>
                   <Label htmlFor="category">Category</Label>
                   <select
                     id="category"
@@ -323,12 +310,6 @@ const Videos = () => {
                 >
                   <Share2 className="mr-2 h-4 w-4" />
                   Share
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => window.open(video.video_url, "_blank")}
-                >
-                  Watch
                 </Button>
               </CardFooter>
             </Card>

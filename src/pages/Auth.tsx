@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +26,7 @@ const Auth = () => {
     email: "",
     password: "",
     fullName: "",
+    phone: "",
   });
 
   const [signInData, setSignInData] = useState({
@@ -45,8 +47,19 @@ const Auth = () => {
     if (error) {
       toast.error(error.message);
     } else {
+      // Update profile with phone number if provided
+      if (signUpData.phone) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase
+            .from('profiles')
+            .update({ phone: signUpData.phone })
+            .eq('id', user.id);
+        }
+      }
+      
       toast.success("Account created successfully! Please log in.");
-      setSignUpData({ email: "", password: "", fullName: "" });
+      setSignUpData({ email: "", password: "", fullName: "", phone: "" });
     }
     setLoading(false);
   };
@@ -162,6 +175,18 @@ const Auth = () => {
                       }
                       required
                       minLength={6}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-phone">Phone Number (Optional)</Label>
+                    <Input
+                      id="signup-phone"
+                      type="tel"
+                      placeholder="+1234567890"
+                      value={signUpData.phone}
+                      onChange={(e) =>
+                        setSignUpData({ ...signUpData, phone: e.target.value })
+                      }
                     />
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
