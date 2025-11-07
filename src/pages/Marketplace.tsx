@@ -155,25 +155,21 @@ const Marketplace = () => {
           <h1 className="text-3xl font-bold">Marketplace</h1>
           <p className="text-muted-foreground">Browse livestock listings from farmers</p>
         </div>
-        {user && (
-          <Link to="/create-listing">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Listing
-            </Button>
-          </Link>
-        )}
+        <Link to={user ? "/create-listing" : "/auth"}>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Listing
+          </Button>
+        </Link>
       </div>
 
       {listings.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <p className="text-muted-foreground mb-4">No listings available yet</p>
-            {user && (
-              <Link to="/create-listing">
-                <Button>Create First Listing</Button>
-              </Link>
-            )}
+            <Link to={user ? "/create-listing" : "/auth"}>
+              <Button>Create First Listing</Button>
+            </Link>
           </CardContent>
         </Card>
       ) : (

@@ -219,68 +219,71 @@ const Videos = () => {
           <h1 className="text-3xl font-bold">Farmer Videos</h1>
           <p className="text-muted-foreground">Share and learn farming techniques</p>
         </div>
-        {user && (
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={(e) => {
+              if (!user) {
+                e.preventDefault();
+                window.location.href = '/auth';
+              }
+            }}>
+              <Plus className="mr-2 h-4 w-4" />
+              Upload Video
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Upload Farming Video</DialogTitle>
+              <DialogDescription>
+                Share your farming techniques with the community
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="category">Category</Label>
+                <select
+                  id="category"
+                  className="w-full p-2 border rounded-md"
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData({ ...formData, category: e.target.value })
+                  }
+                >
+                  <option value="feeding">Feeding</option>
+                  <option value="treatment">Treatment</option>
+                  <option value="rearing">Rearing</option>
+                  <option value="breeding">Breeding</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <Button type="submit" className="w-full">
                 Upload Video
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Upload Farming Video</DialogTitle>
-                <DialogDescription>
-                  Share your farming techniques with the community
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="category">Category</Label>
-                  <select
-                    id="category"
-                    className="w-full p-2 border rounded-md"
-                    value={formData.category}
-                    onChange={(e) =>
-                      setFormData({ ...formData, category: e.target.value })
-                    }
-                  >
-                    <option value="feeding">Feeding</option>
-                    <option value="treatment">Treatment</option>
-                    <option value="rearing">Rearing</option>
-                    <option value="breeding">Breeding</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                <Button type="submit" className="w-full">
-                  Upload Video
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        )}
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {videos.length === 0 ? (
@@ -288,9 +291,13 @@ const Videos = () => {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Video className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground mb-4">No videos uploaded yet</p>
-            {user && (
-              <Button onClick={() => setDialogOpen(true)}>Upload First Video</Button>
-            )}
+            <Button onClick={() => {
+              if (user) {
+                setDialogOpen(true);
+              } else {
+                window.location.href = '/auth';
+              }
+            }}>Upload First Video</Button>
           </CardContent>
         </Card>
       ) : (
