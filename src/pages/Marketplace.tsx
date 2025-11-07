@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Plus, Phone, Mail } from "lucide-react";
+import { MapPin, Plus, Phone, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -94,6 +94,36 @@ const Marketplace = () => {
 
     setSelectedSeller(data);
     setContactDialogOpen(true);
+  };
+
+  const handleDelete = async (listingId: string) => {
+    if (!user) return;
+    
+    if (!window.confirm("Are you sure you want to delete this listing?")) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from("livestock_listings")
+      .delete()
+      .eq("id", listingId)
+      .eq("seller_id", user.id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete listing",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "Listing deleted successfully",
+    });
+
+    fetchListings();
   };
 
   const getCategoryColor = (category: string) => {
@@ -188,13 +218,22 @@ const Marketplace = () => {
                   </p>
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="flex gap-2">
                 <Button 
-                  className="w-full"
+                  className="flex-1"
                   onClick={() => handleContactSeller(listing.seller_id)}
                 >
                   Contact Seller
                 </Button>
+                {user && listing.seller_id === user.id && (
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => handleDelete(listing.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}

@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Share2, Plus, Video } from "lucide-react";
+import { Heart, Share2, Plus, Video, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -136,6 +136,36 @@ const Videos = () => {
       title: "Link copied!",
       description: "Video link has been copied to clipboard",
     });
+  };
+
+  const handleDelete = async (videoId: string) => {
+    if (!user) return;
+    
+    if (!window.confirm("Are you sure you want to delete this video?")) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from("videos")
+      .delete()
+      .eq("id", videoId)
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete video",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "Video deleted successfully",
+    });
+
+    fetchVideos();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -290,27 +320,38 @@ const Videos = () => {
                 </p>
               </CardHeader>
               <CardFooter className="flex justify-between">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleLike(video.id)}
-                  className={userLikes.has(video.id) ? "text-red-500" : ""}
-                >
-                  <Heart
-                    className={`mr-2 h-4 w-4 ${
-                      userLikes.has(video.id) ? "fill-current" : ""
-                    }`}
-                  />
-                  {video.likes_count}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleShare(video.id)}
-                >
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Share
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleLike(video.id)}
+                    className={userLikes.has(video.id) ? "text-red-500" : ""}
+                  >
+                    <Heart
+                      className={`mr-2 h-4 w-4 ${
+                        userLikes.has(video.id) ? "fill-current" : ""
+                      }`}
+                    />
+                    {video.likes_count}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleShare(video.id)}
+                  >
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Share
+                  </Button>
+                </div>
+                {user && video.user_id === user.id && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDelete(video.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}
