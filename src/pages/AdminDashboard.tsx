@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { ListingManagement } from "@/components/admin/ListingManagement";
 import { EducationManagement } from "@/components/admin/EducationManagement";
+import { NotificationBell } from "@/components/admin/NotificationBell";
 
 interface Commission {
   id: string;
@@ -130,11 +131,14 @@ const AdminDashboard = () => {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-muted-foreground">
-          Manage users, listings, and platform content
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
+          <p className="text-muted-foreground">
+            Manage users, listings, and platform content
+          </p>
+        </div>
+        <NotificationBell />
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
